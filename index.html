@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HobbyHub — Community Forum</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --bg2: #ede7d9;
+  --bg3: #e4dccb;
+  --surface: #faf7f2;
+  --surface2: #f0ebe0;
+  --border: #d4c9b0;
+  --border2: #c4b89a;
+  --text: #2a2318;
+  --text2: #5a4f3c;
+  --text3: #8a7d68;
+  --accent: #c84b2f;
+  --accent2: #e8693a;
+  --accent-bg: #fdf0ec;
+  --green: #2d7a4f;
+  --green-bg: #edf7f1;
+  --blue: #2563a8;
+  --blue-bg: #edf3fc;
+  --gold: #b8860b;
+  --gold-bg: #fdf8e8;
+  --shadow: 0 2px 8px rgba(42,35,24,0.08);
+  --shadow-lg: 0 8px 32px rgba(42,35,24,0.14);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+[data-theme="dark"] {
+  --bg: #1a1612;
+  --bg2: #211e19;
+  --bg3: #2a2620;
+  --surface: #241f19;
+  --surface2: #2e2922;
+  --border: #3d3628;
+  --border2: #4d4535;
+  --text: #f0e8d8;
+  --text2: #c0b49e;
+  --text3: #8a7d68;
+  --accent: #e8693a;
+  --accent2: #f07848;
+  --accent-bg: #2a1f18;
+  --green: #4aad72;
+  --green-bg: #162a1f;
+  --blue: #5b9bd5;
+  --blue-bg: #151e2a;
+  --gold: #d4a017;
+  --gold-bg: #221d0e;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+h1,h2,h3,h4 { font-family: 'Fraunces', serif; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* LAYOUT */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
+.page { display: none; flex: 1; }
+.page.active { display: block; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 16px;
+  height: 64px; position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow);
+}
+.topbar-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem; font-weight: 800;
+  color: var(--accent);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  text-decoration: none;
+}
+.topbar-logo span { color: var(--text); }
+.topbar-search {
+  flex: 1; max-width: 400px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 24px; padding: 6px 14px;
+  transition: border-color 0.2s;
+}
+.topbar-search:focus-within { border-color: var(--accent); }
+.topbar-search input { border: none; background: transparent; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; width: 100%; }
+.topbar-search input::placeholder { color: var(--text3); }
+.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 24px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; text-decoration: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(200,75,47,0.3); }
+.btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border2); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--text2); padding: 8px 12px; }
+.btn-ghost:hover { background: var(--bg2); color: var(--text); }
+.btn-danger { background: #dc2626; color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-success { background: var(--green); color: #fff; }
+.btn-success:hover { opacity: 0.9; }
+.btn-sm { padding: 5px 12px; font-size: 0.8rem; }
+.btn-icon { padding: 8px; border-radius: 50%; }
+
+/* THEME TOGGLE */
+.theme-toggle { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 24px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; gap: 6px; color: var(--text2); font-size: 1rem; transition: all 0.2s; }
+.theme-toggle:hover { border-color: var(--accent); }
+
+/* AVATAR */
+.avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
+.avatar-lg { width: 64px; height: 64px; font-size: 1.5rem; }
+.avatar-xl { width: 96px; height: 96px; font-size: 2.2rem; border-width: 3px; }
+
+/* USER MENU */
+.user-menu-wrap { position: relative; }
+.user-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 180px; overflow: hidden; display: none; z-index: 200; }
+.user-menu.open { display: block; animation: fadeDown 0.15s ease; }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text); cursor: pointer; font-size: 0.875rem; transition: background 0.15s; }
+.user-menu-item:hover { background: var(--bg2); }
+.user-menu-item.danger { color: #dc2626; }
+.user-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* MAIN CONTENT */
+.main { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.main-wide { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+/* HERO */
+.hero { background: linear-gradient(135deg, var(--surface) 0%, var(--bg2) 100%); border: 2px solid var(--border); border-radius: 20px; padding: 48px 40px; margin-bottom: 32px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: radial-gradient(circle, var(--accent-bg) 0%, transparent 70%); }
+.hero-tag { display: inline-block; background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px; }
+.hero h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; margin-bottom: 12px; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero p { color: var(--text2); font-size: 1.05rem; max-width: 520px; margin-bottom: 24px; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-stats { display: flex; gap: 32px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+.hero-stat-label { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* CATEGORY GRID */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-header h2 { font-size: 1.4rem; font-weight: 700; }
+.section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 8px; }
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 40px; }
+.category-card {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius); padding: 20px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; display: block;
+}
+.category-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.category-card-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+.category-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+.category-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+.category-card p { font-size: 0.83rem; color: var(--text2); line-height: 1.4; }
+.category-meta { display: flex; gap: 16px; font-size: 0.78rem; color: var(--text3); }
+.category-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* THREAD LIST */
+.thread-list { display: flex; flex-direction: column; gap: 8px; }
+.thread-item {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 18px;
+  display: grid; grid-template-columns: auto 1fr auto; gap: 14px;
+  align-items: center; cursor: pointer; transition: all 0.2s;
+  text-decoration: none;
+}
+.thread-item:hover { border-color: var(--accent); background: var(--surface2); }
+.thread-item.pinned { border-left: 3px solid var(--gold); }
+.thread-item.locked { opacity: 0.75; }
+.thread-badges { display: flex; gap: 5px; margin-bottom: 4px; flex-wrap: wrap; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; }
+.badge-pin { background: var(--gold-bg); color: var(--gold); }
+.badge-lock { background: var(--bg3); color: var(--text3); }
+.badge-new { background: var(--accent-bg); color: var(--accent); }
+.badge-hot { background: #fef3c7; color: #d97706; }
+.badge-mod { background: var(--green-bg); color: var(--green); }
+.badge-admin { background: var(--accent-bg); color: var(--accent); }
+.thread-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; color: var(--text); }
+.thread-meta { font-size: 0.78rem; color: var(--text3); }
+.thread-stats { text-align: right; font-size: 0.78rem; color: var(--text3); }
+.thread-stats .stat-num { font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--text2); display: block; }
+
+/* POST / THREAD VIEW */
+.thread-header { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+.thread-header h1 { font-size: 1.7rem; margin-bottom: 8px; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text3); margin-bottom: 12px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--accent); cursor: pointer; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.post-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.post-card.op { border-color: var(--accent); border-width: 2px; }
+.post-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.post-user-info { flex: 1; }
+.post-username { font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+.post-username:hover { color: var(--accent); }
+.post-role { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.post-role.admin { color: var(--accent); }
+.post-role.mod { color: var(--green); }
+.post-role.member { color: var(--text3); }
+.post-date { font-size: 0.75rem; color: var(--text3); margin-left: auto; }
+.post-body { padding: 18px; font-size: 0.92rem; line-height: 1.7; color: var(--text); }
+.post-body p { margin-bottom: 10px; }
+.post-body p:last-child { margin-bottom: 0; }
+.post-body strong { font-weight: 600; }
+.post-body em { font-style: italic; }
+.post-body code { background: var(--bg3); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
+.post-body blockquote { border-left: 3px solid var(--accent); padding: 8px 14px; background: var(--bg2); border-radius: 0 6px 6px 0; margin: 8px 0; color: var(--text2); font-style: italic; }
+.post-body ul, .post-body ol { padding-left: 20px; margin-bottom: 10px; }
+.post-body li { margin-bottom: 4px; }
+.post-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--bg2); }
+.reaction-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; font-size: 0.8rem; color: var(--text2); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.reaction-btn:hover, .reaction-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+.reaction-btn .count { font-weight: 600; }
+
+/* REPLY EDITOR */
+.reply-box { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 20px; }
+.reply-box h3 { font-size: 1.1rem; margin-bottom: 14px; }
+.editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.editor-btn { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(--text2); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.editor-btn:hover { background: var(--bg3); color: var(--text); }
+.editor-textarea { width: 100%; min-height: 120px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; resize: vertical; outline: none; line-height: 1.6; transition: border-color 0.2s; }
+.editor-textarea:focus { border-color: var(--accent); }
+.editor-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.char-count { font-size: 0.75rem; color: var(--text3); }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+.modal { background: var(--surface); border: 2px solid var(--border); border-radius: 20px; padding: 32px; max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); animation: slideUp 0.25s ease; max-height: 90vh; overflow-y: auto; }
+.modal-wide { max-width: 680px; }
+.modal h2 { font-size: 1.5rem; margin-bottom: 6px; }
+.modal-subtitle { color: var(--text2); font-size: 0.875rem; margin-bottom: 24px; }
+.modal-close { float: right; background: none; border: none; cursor: pointer; color: var(--text3); font-size: 1.2rem; padding: 4px; margin-top: -4px; }
+.modal-close:hover { color: var(--text); }
+
+/* FORMS */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-select option { background: var(--surface); }
+.form-hint { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
+.form-error { font-size: 0.78rem; color: #dc2626; margin-top: 4px; }
+.form-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: var(--text3); font-size: 0.8rem; }
+.form-divider::before, .form-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* TABS */
+.tabs { display: flex; gap: 2px; background: var(--bg2); border-radius: 10px; padding: 3px; margin-bottom: 20px; }
+.tab { flex: 1; text-align: center; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: var(--text2); transition: all 0.2s; border: none; background: none; font-family: 'DM Sans', sans-serif; }
+.tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+
+/* SIDEBAR LAYOUT */
+.two-col { display: grid; grid-template-columns: 1fr 280px; gap: 24px; align-items: start; }
+.sidebar-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+.sidebar-card h3 { font-size: 1rem; margin-bottom: 12px; }
+
+/* PROFILE PAGE */
+.profile-header { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; display: flex; gap: 24px; align-items: flex-start; }
+.profile-info { flex: 1; }
+.profile-name { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+.profile-joined { font-size: 0.8rem; color: var(--text3); margin-bottom: 12px; }
+.profile-bio { color: var(--text2); font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px; }
+.profile-stats { display: flex; gap: 24px; }
+.profile-stat { text-align: center; }
+.profile-stat-num { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+.profile-stat-label { font-size: 0.75rem; color: var(--text3); }
+
+/* ADMIN */
+.admin-sidebar { width: 220px; flex-shrink: 0; }
+.admin-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.875rem; color: var(--text2); transition: all 0.15s; margin-bottom: 2px; }
+.admin-nav-item:hover { background: var(--bg2); color: var(--text); }
+.admin-nav-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+.admin-content { flex: 1; }
+.admin-layout { display: flex; gap: 24px; align-items: flex-start; }
+.stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.stat-card-num { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 800; color: var(--accent); }
+.stat-card-label { font-size: 0.8rem; color: var(--text2); margin-top: 4px; }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.table th { text-align: left; padding: 10px 14px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); border-bottom: 2px solid var(--border); }
+.table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+.table tr:hover td { background: var(--bg2); }
+.badge-role { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+.badge-role.admin { background: var(--accent-bg); color: var(--accent); }
+.badge-role.moderator { background: var(--green-bg); color: var(--green); }
+.badge-role.member { background: var(--bg3); color: var(--text3); }
+.badge-role.banned { background: #fee2e2; color: #dc2626; }
+
+/* SEARCH RESULTS */
+.search-result { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+.search-result:hover { border-color: var(--accent); }
+.search-result h4 { font-size: 0.95rem; margin-bottom: 4px; }
+.search-result p { font-size: 0.8rem; color: var(--text2); }
+.search-result-path { font-size: 0.75rem; color: var(--accent); margin-top: 4px; }
+
+/* NOTIFICATIONS */
+.notif-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: absolute; top: 6px; right: 6px; }
+
+/* TOAST */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 18px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; font-size: 0.875rem; animation: slideLeft 0.3s ease; min-width: 260px; max-width: 360px; }
+.toast.success { border-color: var(--green); }
+.toast.error { border-color: #dc2626; }
+.toast.success::before { content: '✓'; color: var(--green); font-weight: 700; }
+.toast.error::before { content: '✕'; color: #dc2626; font-weight: 700; }
+.toast.info::before { content: 'ℹ'; color: var(--blue); font-weight: 700; }
+
+/* AVATAR PICKER */
+.avatar-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.avatar-opt { width: 48px; height: 48px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.avatar-opt:hover, .avatar-opt.selected { border-color: var(--accent); transform: scale(1.1); }
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text3); }
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state h3 { font-size: 1.1rem; color: var(--text2); margin-bottom: 6px; }
+
+/* ONLINE INDICATOR */
+.online-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; border: 2px solid var(--surface); position: absolute; bottom: 0; right: 0; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .two-col { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.9rem; }
+  .admin-layout { flex-direction: column; }
+  .admin-sidebar { width: 100%; }
+  .topbar-search { display: none; }
+  .hero-stats { gap: 16px; }
+}
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* QUOTE BLOCK in post */
+.quote-block { background: var(--bg2); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 8px 0; }
+.quote-author { font-size: 0.75rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+
+/* PAGINATION */
+.pagination { display: flex; align-items: center; gap: 6px; margin-top: 20px; justify-content: center; }
+.page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.875rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.page-btn:hover { border-color: var(--accent); color: var(--accent); }
+.page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* CHIP SELECT */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--bg2); cursor: pointer; font-size: 0.8rem; font-weight: 500; color: var(--text2); transition: all 0.15s; }
+.chip:hover, .chip.selected { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+
+/* COLOR SWATCHES for category */
+.color-accent-1 { background: #fff3e8; }
+.color-accent-2 { background: #e8f4ff; }
+.color-accent-3 { background: #f0ffe8; }
+.color-accent-4 { background: #ffe8f8; }
+.color-accent-5 { background: #e8fff8; }
+.color-accent-6 { background: #f8f0ff; }
+[data-theme="dark"] .color-accent-1 { background: #2a1e12; }
+[data-theme="dark"] .color-accent-2 { background: #12202a; }
+[data-theme="dark"] .color-accent-3 { background: #122212; }
+[data-theme="dark"] .color-accent-4 { background: #2a1222; }
+[data-theme="dark"] .color-accent-5 { background: #122222; }
+[data-theme="dark"] .color-accent-6 { background: #1e1228; }
+
+.sticky-top { position: sticky; top: 80px; }
+
+#new-thread-btn-float {
+  position: fixed; bottom: 28px; right: 28px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: 50%; width: 56px; height: 56px;
+  font-size: 1.6rem; cursor: pointer; box-shadow: 0 4px 16px rgba(200,75,47,0.4);
+  display: none; align-items: center; justify-content: center;
+  transition: all 0.2s; z-index: 500;
+}
+#new-thread-btn-float:hover { transform: scale(1.1); }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a class="topbar-logo" onclick="showPage('home')">🍀 Hobby<span>Hub</span></a>
+  <div class="topbar-search">
+    <span>🔍</span>
+    <input type="text" id="search-input" placeholder="Search threads, topics, users…" oninput="liveSearch(this.value)" onkeydown="if(event.key==='Enter')doSearch(this.value)">
+  </div>
+  <div class="topbar-actions">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <span id="theme-icon">🌙</span>
+    </button>
+    <div id="auth-buttons">
+      <button class="btn btn-outline btn-sm" onclick="openModal('login-modal')">Log In</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('register-modal')">Sign Up</button>
+    </div>
+    <div id="user-buttons" style="display:none;">
+      <button class="btn btn-primary btn-sm" onclick="openModal('new-thread-modal')" id="new-thread-topbtn">✏️ New Thread</button>
+      <div class="user-menu-wrap">
+        <button class="btn btn-ghost" onclick="toggleUserMenu()" id="user-menu-btn">
+          <div class="avatar" id="topbar-avatar" style="background:#c84b2f">?</div>
+          <span id="topbar-username">User</span> ▾
+        </button>
+        <div class="user-menu" id="user-menu">
+          <div class="user-menu-item" onclick="showProfile(currentUser?.id)">👤 My Profile</div>
+          <div class="user-menu-item" onclick="openModal('edit-profile-modal')">⚙️ Edit Profile</div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-item" id="admin-link" style="display:none" onclick="showPage('admin')">🛡️ Admin Panel</div>
+          <div class="user-menu-item danger" onclick="logout()">🚪 Log Out</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- FLOAT BUTTON -->
+<button id="new-thread-btn-float" onclick="openModal('new-thread-modal')" title="New Thread">✏️</button>
+
+<!-- ===== PAGES ===== -->
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="main">
+    <div class="hero" id="hero-section">
+      <div class="hero-tag">🌟 Welcome to HobbyHub</div>
+      <h1>Where <em>passions</em> find their community</h1>
+      <p>Join thousands of hobbyists sharing tips, projects, and stories across every interest imaginable.</p>
+      <div class="hero-actions" id="hero-actions">
+        <button class="btn btn-primary" onclick="openModal('register-modal')">Join the Community</button>
+        <button class="btn btn-outline" onclick="scrollToCategories()">Browse Topics</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-members">0</div><div class="hero-stat-label">Members</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-threads">0</div><div class="hero-stat-label">Threads</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-posts">0</div><div class="hero-stat-label">Posts</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="stat-categories">0</div><div class="hero-stat-label">Categories</div></div>
+      </div>
+    </div>
+
+    <div id="categories-section">
+      <div class="section-header">
+        <div>
+          <div class="section-label">📂 All Topics</div>
+          <h2>Browse Categories</h2>
+        </div>
+        <button class="btn btn-outline btn-sm" id="manage-cats-btn" style="display:none" onclick="openModal('manage-cats-modal')">+ Add Category</button>
+      </div>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <div>
+      <div class="section-header">
+        <div>
+          <div class="section-label">🔥 Latest Activity</div>
+          <h2>Recent Threads</h2>
+        </div>
+      </div>
+      <div class="thread-list" id="recent-threads"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY PAGE -->
+<div class="page" id="page-category">
+  <div class="main">
+    <div class="two-col">
+      <div>
+        <div class="thread-header" id="cat-header"></div>
+        <div class="section-header">
+          <h2>Threads</h2>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select class="form-select" style="width:auto;padding:6px 10px;font-size:0.8rem" onchange="sortThreads(this.value)">
+              <option value="latest">Latest</option>
+              <option value="popular">Most Popular</option>
+              <option value="replies">Most Replies</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="openModal('new-thread-modal')" id="cat-new-thread-btn" style="display:none">✏️ New Thread</button>
+          </div>
+        </div>
+        <div class="thread-list" id="cat-thread-list"></div>
+        <div class="pagination" id="cat-pagination"></div>
+      </div>
+      <div>
+        <div class="sidebar-card sticky-top">
+          <h3>About this Category</h3>
+          <p id="sidebar-cat-desc" style="font-size:0.85rem;color:var(--text2);line-height:1.5"></p>
+          <div class="divider"></div>
+          <div style="font-size:0.82rem;color:var(--text3)" id="sidebar-cat-stats"></div>
+        </div>
+        <div class="sidebar-card">
+          <h3>Top Contributors</h3>
+          <div id="top-contributors"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THREAD PAGE -->
+<div class="page" id="page-thread">
+  <div class="main">
+    <div class="two-col">
+      <div>
+        <div class="thread-header" id="thread-header-info"></div>
+        <div id="post-list"></div>
+        <div class="pagination" id="thread-pagination"></div>
+        <div id="reply-section"></div>
+      </div>
+      <div>
+        <div class="sidebar-card sticky-top" id="thread-sidebar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="page-profile">
+  <div class="main">
+    <div id="profile-content"></div>
+  </div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div class="page" id="page-search">
+  <div class="main">
+    <h2 style="margin-bottom:6px">Search Results</h2>
+    <p style="color:var(--text3);font-size:0.875rem;margin-bottom:20px" id="search-query-label"></p>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div class="page" id="page-admin">
+  <div class="main-wide">
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:1.8rem;margin-bottom:4px">🛡️ Admin Panel</h1>
+      <p style="color:var(--text2);font-size:0.875rem">Manage your HobbyHub community</p>
+    </div>
+    <div class="admin-layout">
+      <div class="admin-sidebar">
+        <div class="admin-nav-item active" onclick="adminTab('dashboard')" id="atab-dashboard">📊 Dashboard</div>
+        <div class="admin-nav-item" onclick="adminTab('users')" id="atab-users">👥 Users</div>
+        <div class="admin-nav-item" onclick="adminTab('categories')" id="atab-categories">📂 Categories</div>
+        <div class="admin-nav-item" onclick="adminTab('threads')" id="atab-threads">💬 Threads</div>
+        <div class="admin-nav-item" onclick="adminTab('settings')" id="atab-settings">⚙️ Settings</div>
+        <div class="divider"></div>
+        <div class="admin-nav-item" onclick="showPage('home')">← Back to Forum</div>
+      </div>
+      <div class="admin-content" id="admin-content"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end app -->
+
+<!-- ===== MODALS ===== -->
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
+    <h2>Welcome back</h2>
+    <p class="modal-subtitle">Sign in to continue to HobbyHub</p>
+    <div class="form-group">
+      <label class="form-label">Username or Email</label>
+      <input class="form-input" id="login-user" placeholder="Enter username or email" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="login-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-error" class="form-error" style="margin-bottom:10px"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In</button>
+    <div class="form-divider">or</div>
+    <p style="text-align:center;font-size:0.875rem;color:var(--text2)">
+      Don't have an account? <a onclick="switchModal('login-modal','register-modal')" style="color:var(--accent);cursor:pointer;font-weight:600">Sign up free</a>
+    </p>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="register-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
+    <h2>Join HobbyHub</h2>
+    <p class="modal-subtitle">Create your free account and start connecting</p>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-input" id="reg-username" placeholder="Choose a username">
+      <div class="form-hint">Letters, numbers, and underscores only</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="reg-email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="reg-pass" placeholder="At least 6 characters">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose an Avatar</label>
+      <div class="avatar-options" id="reg-avatar-options"></div>
+    </div>
+    <div id="reg-error" class="form-error" style="margin-bottom:10px"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Create Account</button>
+    <div class="form-divider">or</div>
+    <p style="text-align:center;font-size:0.875rem;color:var(--text2)">
+      Already have an account? <a onclick="switchModal('register-modal','login-modal')" style="color:var(--accent);cursor:pointer;font-weight:600">Sign in</a>
+    </p>
+  </div>
+</div>
+
+<!-- NEW THREAD MODAL -->
+<div class="modal-overlay" id="new-thread-modal">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeModal('new-thread-modal')">✕</button>
+    <h2>Create New Thread</h2>
+    <p class="modal-subtitle">Start a discussion in the community</p>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="thread-category"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Thread Title</label>
+      <input class="form-input" id="thread-title" placeholder="What's your thread about?" maxlength="120">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <div class="editor-toolbar" id="thread-editor-toolbar"></div>
+      <textarea class="editor-textarea" id="thread-content" placeholder="Share your thoughts, questions, or ideas…" rows="6"></textarea>
+      <div class="editor-footer">
+        <span class="char-count" id="thread-char-count">0 characters</span>
+      </div>
+    </div>
+    <div id="thread-error" class="form-error" style="margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeModal('new-thread-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="createThread()">Post Thread</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="edit-profile-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-profile-modal')">✕</button>
+    <h2>Edit Profile</h2>
+    <div class="form-group">
+      <label class="form-label">Display Name</label>
+      <input class="form-input" id="edit-displayname" placeholder="Your display name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bio</label>
+      <textarea class="form-textarea" id="edit-bio" placeholder="Tell the community about yourself…" maxlength="300"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Choose Avatar</label>
+      <div class="avatar-options" id="edit-avatar-options"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-outline" onclick="closeModal('edit-profile-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE CATEGORIES MODAL -->
+<div class="modal-overlay" id="manage-cats-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('manage-cats-modal')">✕</button>
+    <h2 id="cat-modal-title">Add Category</h2>
+    <div class="form-group">
+      <label class="form-label">Category Name</label>
+      <input class="form-input" id="cat-name" placeholder="e.g. Photography">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="cat-desc" placeholder="What is this category about?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icon (emoji)</label>
+      <input class="form-input" id="cat-icon" placeholder="📸" maxlength="4">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color Theme</label>
+      <div class="chip-group" id="cat-color-picker"></div>
+    </div>
+    <input type="hidden" id="cat-edit-id">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-outline" onclick="closeModal('manage-cats-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCategory()">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT USER MODAL (admin) -->
+<div class="modal-overlay" id="edit-user-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('edit-user-modal')">✕</button>
+    <h2>Edit User</h2>
+    <div id="edit-user-form"></div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA STORE ====================
+const STORE_KEY = 'hobbyhub_data';
+let DB = {};
+
+const AVATARS = ['🦊','🐺','🦁','🐯','🦋','🌸','🌊','⚡','🔥','🌿','🎸','🎨','🏔️','🌙','☀️','🎭','🚀','🦄','🐉','🎯'];
+const CAT_COLORS = ['color-accent-1','color-accent-2','color-accent-3','color-accent-4','color-accent-5','color-accent-6'];
+const CAT_COLOR_LABELS = ['Warm Orange','Cool Blue','Fresh Green','Soft Pink','Teal','Purple'];
+
+function initDB() {
+  const saved = localStorage.getItem(STORE_KEY);
+  if (saved) { DB = JSON.parse(saved); return; }
+  DB = {
+    users: [],
+    categories: [
+      { id: 'cat1', name: 'Photography', desc: 'Cameras, techniques, editing tips, and sharing your best shots.', icon: '📸', color: 'color-accent-2', threads: 0, posts: 0, createdAt: Date.now() },
+      { id: 'cat2', name: 'Gardening', desc: "Growing plants, vegetables, flowers, and all things green.", icon: '🌱', color: 'color-accent-3', threads: 0, posts: 0, createdAt: Date.now() },
+      { id: 'cat3', name: 'Board Games', desc: 'Strategy games, card games, tabletop RPGs and reviews.', icon: '🎲', color: 'color-accent-1', threads: 0, posts: 0, createdAt: Date.now() },
+      { id: 'cat4', name: 'Crafts & DIY', desc: 'Knitting, woodworking, painting, and creative projects.', icon: '🎨', color: 'color-accent-4', threads: 0, posts: 0, createdAt: Date.now() },
+      { id: 'cat5', name: 'Cooking', desc: 'Recipes, techniques, cuisines, and food photography.', icon: '🍳', color: 'color-accent-1', threads: 0, posts: 0, createdAt: Date.now() },
+      { id: 'cat6', name: 'Music', desc: 'Instruments, production, recommendations, and music theory.', icon: '🎵', color: 'color-accent-6', threads: 0, posts: 0, createdAt: Date.now() },
+    ],
+    threads: [],
+    posts: [],
+    settings: { forumName: 'HobbyHub', forumTagline: 'Where passions find their community' }
+  };
+  // Seed admin
+  DB.users.push({ id: 'admin', username: 'admin', email: 'admin@hobbyhub.com', password: 'admin123', role: 'admin', avatar: '🛡️', displayName: 'Admin', bio: 'Forum administrator', joinedAt: Date.now(), postCount: 0 });
+  saveDB();
+}
+
+function saveDB() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(DB));
+}
+
+// ==================== AUTH ====================
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  const user = DB.users.find(x => (x.username === u || x.email === u) && x.password === p);
+  if (!user) { err.textContent = 'Invalid credentials. Please try again.'; return; }
+  if (user.role === 'banned') { err.textContent = 'Your account has been banned.'; return; }
+  currentUser = user;
+  err.textContent = '';
+  closeModal('login-modal');
+  updateAuthUI();
+  toast('Welcome back, ' + user.displayName + '! 👋', 'success');
+}
+
+function doRegister() {
+  const un = document.getElementById('reg-username').value.trim();
+  const em = document.getElementById('reg-email').value.trim();
+  const pw = document.getElementById('reg-pass').value;
+  const err = document.getElementById('reg-error');
+  const av = document.querySelector('#reg-avatar-options .avatar-opt.selected');
+  if (!un || !em || !pw) { err.textContent = 'Please fill in all fields.'; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(un)) { err.textContent = 'Username can only contain letters, numbers, and underscores.'; return; }
+  if (pw.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
+  if (DB.users.find(x => x.username.toLowerCase() === un.toLowerCase())) { err.textContent = 'Username already taken.'; return; }
+  if (DB.users.find(x => x.email === em)) { err.textContent = 'Email already registered.'; return; }
+  const user = { id: 'u' + Date.now(), username: un, email: em, password: pw, role: 'member', avatar: av ? av.dataset.av : '🦊', displayName: un, bio: '', joinedAt: Date.now(), postCount: 0 };
+  DB.users.push(user);
+  saveDB();
+  currentUser = user;
+  err.textContent = '';
+  closeModal('register-modal');
+  updateAuthUI();
+  toast('Welcome to HobbyHub, ' + un + '! 🎉', 'success');
+}
+
+function logout() {
+  currentUser = null;
+  updateAuthUI();
+  showPage('home');
+  toast('Logged out. See you soon!', 'info');
+}
+
+function updateAuthUI() {
+  const authBtns = document.getElementById('auth-buttons');
+  const userBtns = document.getElementById('user-buttons');
+  if (currentUser) {
+    authBtns.style.display = 'none';
+    userBtns.style.display = 'flex';
+    document.getElementById('topbar-username').textContent = currentUser.displayName;
+    const av = document.getElementById('topbar-avatar');
+    av.textContent = currentUser.avatar;
+    av.style.background = avatarBg(currentUser.username);
+    document.getElementById('hero-actions').innerHTML = `<button class="btn btn-primary" onclick="openModal('new-thread-modal')">✏️ Start a Thread</button><button class="btn btn-outline" onclick="scrollToCategories()">Browse Topics</button>`;
+    document.getElementById('admin-link').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+    document.getElementById('manage-cats-btn').style.display = currentUser.role === 'admin' ? 'block' : 'none';
+    document.getElementById('new-thread-btn-float').style.display = 'flex';
+    const catBtn = document.getElementById('cat-new-thread-btn');
+    if (catBtn) catBtn.style.display = 'flex';
+  } else {
+    authBtns.style.display = 'flex';
+    userBtns.style.display = 'none';
+    document.getElementById('hero-actions').innerHTML = `<button class="btn btn-primary" onclick="openModal('register-modal')">Join the Community</button><button class="btn btn-outline" onclick="scrollToCategories()">Browse Topics</button>`;
+    document.getElementById('new-thread-btn-float').style.display = 'none';
+    document.getElementById('manage-cats-btn').style.display = 'none';
+  }
+  updateStats();
+}
+
+function avatarBg(username) {
+  const colors = ['#c84b2f','#2563a8','#2d7a4f','#7c3aed','#b8860b','#0891b2'];
+  let h = 0; for (let c of username) h = (h * 31 + c.charCodeAt(0)) % colors.length;
+  return colors[h];
+}
+
+// ==================== PAGES ====================
+let currentCategory = null;
+let currentThread = null;
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'home') renderHome();
+  if (id === 'admin') renderAdmin();
+  toggleUserMenu(false);
+}
+
+function renderHome() {
+  renderCategories();
+  renderRecentThreads();
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('stat-members').textContent = DB.users.filter(u => u.role !== 'banned').length;
+  document.getElementById('stat-threads').textContent = DB.threads.length;
+  document.getElementById('stat-posts').textContent = DB.posts.length;
+  document.getElementById('stat-categories').textContent = DB.categories.length;
+}
+
+function scrollToCategories() {
+  document.getElementById('categories-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ==================== CATEGORIES ====================
+function renderCategories() {
+  const grid = document.getElementById('category-grid');
+  if (!DB.categories.length) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div><h3>No categories yet</h3></div>'; return; }
+  grid.innerHTML = DB.categories.map(cat => {
+    const threads = DB.threads.filter(t => t.categoryId === cat.id).length;
+    const posts = DB.posts.filter(p => DB.threads.find(t => t.id === p.threadId && t.categoryId === cat.id)).length;
+    const lastT = DB.threads.filter(t => t.categoryId === cat.id).sort((a,b)=>b.lastPostAt-a.lastPostAt)[0];
+    const lastUser = lastT ? DB.users.find(u => u.id === lastT.lastPostBy) : null;
+    return `<div class="category-card ${cat.color}" onclick="showCategory('${cat.id}')">
+      <div class="category-card-top">
+        <div class="category-icon ${cat.color}">${cat.icon}</div>
+        <div>
+          <h3>${esc(cat.name)}</h3>
+          <p>${esc(cat.desc)}</p>
+        </div>
+      </div>
+      <div class="category-meta">
+        <span>💬 ${threads} threads</span>
+        <span>📝 ${posts} posts</span>
+        ${lastUser ? `<span>🕐 ${timeAgo(lastT.lastPostAt)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showCategory(catId) {
+  currentCategory = DB.categories.find(c => c.id === catId);
+  if (!currentCategory) return;
+  showPage('category');
+  renderCategory();
+}
+
+function renderCategory(sort='latest') {
+  const cat = currentCategory;
+  document.getElementById('cat-header').innerHTML = `
+    <div class="breadcrumb"><a onclick="showPage('home')">🏠 Home</a> / <span>${esc(cat.name)}</span></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="category-icon ${cat.color}" style="font-size:2rem;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center">${cat.icon}</div>
+      <div><h1>${esc(cat.name)}</h1><p style="color:var(--text2);font-size:0.9rem">${esc(cat.desc)}</p></div>
+    </div>`;
+  document.getElementById('sidebar-cat-desc').textContent = cat.desc;
+  let threads = DB.threads.filter(t => t.categoryId === cat.id);
+  if (sort === 'popular') threads.sort((a,b) => (b.views||0)-(a.views||0));
+  else if (sort === 'replies') threads.sort((a,b) => (b.replyCount||0)-(a.replyCount||0));
+  else threads.sort((a,b) => b.lastPostAt - a.lastPostAt);
+  const pinned = threads.filter(t => t.pinned);
+  const normal = threads.filter(t => !t.pinned);
+  const all = [...pinned, ...normal];
+  document.getElementById('sidebar-cat-stats').innerHTML = `<strong>${all.length}</strong> threads &nbsp;·&nbsp; <strong>${DB.posts.filter(p => DB.threads.find(t=>t.id===p.threadId && t.categoryId===cat.id)).length}</strong> posts`;
+  if (!all.length) { document.getElementById('cat-thread-list').innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><h3>No threads yet</h3><p>Be the first to post!</p></div>'; return; }
+  document.getElementById('cat-thread-list').innerHTML = all.map(t => threadItem(t)).join('');
+  // Top contributors
+  const contribMap = {};
+  DB.posts.filter(p => DB.threads.find(t=>t.id===p.threadId&&t.categoryId===cat.id)).forEach(p => { contribMap[p.authorId] = (contribMap[p.authorId]||0)+1; });
+  const topC = Object.entries(contribMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  document.getElementById('top-contributors').innerHTML = topC.length ? topC.map(([uid, cnt]) => {
+    const u = DB.users.find(x=>x.id===uid);
+    if (!u) return '';
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer" onclick="showProfile('${u.id}')">
+      <div class="avatar" style="background:${avatarBg(u.username)}">${u.avatar}</div>
+      <div><div style="font-size:0.85rem;font-weight:600">${esc(u.displayName)}</div><div style="font-size:0.75rem;color:var(--text3)">${cnt} posts</div></div>
+    </div>`;
+  }).join('') : '<p style="font-size:0.82rem;color:var(--text3)">No posts yet</p>';
+  if (currentUser) document.getElementById('cat-new-thread-btn').style.display = 'flex';
+}
+
+function sortThreads(val) { renderCategory(val); }
+
+function threadItem(t) {
+  const author = DB.users.find(u => u.id === t.authorId);
+  const replies = DB.posts.filter(p => p.threadId === t.id).length - 1;
+  return `<div class="thread-item ${t.pinned?'pinned':''}" onclick="showThread('${t.id}')">
+    <div class="avatar" style="background:${author?avatarBg(author.username):'#888'}">${author?author.avatar:'?'}</div>
+    <div>
+      <div class="thread-badges">
+        ${t.pinned?'<span class="badge badge-pin">📌 Pinned</span>':''}
+        ${t.locked?'<span class="badge badge-lock">🔒 Locked</span>':''}
+        ${Date.now()-t.createdAt < 86400000?'<span class="badge badge-new">New</span>':''}
+        ${(t.replyCount||0) > 20?'<span class="badge badge-hot">🔥 Hot</span>':''}
+      </div>
+      <div class="thread-title">${esc(t.title)}</div>
+      <div class="thread-meta">by ${author?esc(author.displayName):'Unknown'} · ${timeAgo(t.createdAt)}</div>
+    </div>
+    <div class="thread-stats">
+      <span class="stat-num">${replies >= 0 ? replies : 0}</span> replies
+      <br><span style="margin-top:4px;display:block">${t.views||0} views</span>
+    </div>
+  </div>`;
+}
+
+// ==================== THREADS ====================
+function showThread(threadId) {
+  currentThread = DB.threads.find(t => t.id === threadId);
+  if (!currentThread) return;
+  currentThread.views = (currentThread.views || 0) + 1;
+  saveDB();
+  showPage('thread');
+  renderThread();
+}
+
+function renderThread() {
+  const t = currentThread;
+  const cat = DB.categories.find(c => c.id === t.categoryId);
+  const author = DB.users.find(u => u.id === t.authorId);
+  document.getElementById('thread-header-info').innerHTML = `
+    <div class="breadcrumb">
+      <a onclick="showPage('home')">🏠 Home</a> /
+      <a onclick="showCategory('${cat?.id}')">${esc(cat?.name||'Category')}</a> /
+      <span>${esc(t.title)}</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <h1>${esc(t.title)}</h1>
+      ${canModerate() ? `<div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-sm btn-outline" onclick="togglePin('${t.id}')">${t.pinned?'Unpin':'📌 Pin'}</button>
+        <button class="btn btn-sm btn-outline" onclick="toggleLock('${t.id}')">${t.locked?'Unlock':'🔒 Lock'}</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteThread('${t.id}')">🗑️</button>
+      </div>` : ''}
+    </div>`;
+  const posts = DB.posts.filter(p => p.threadId === t.id).sort((a,b) => a.createdAt - b.createdAt);
+  document.getElementById('post-list').innerHTML = posts.map((p, i) => renderPost(p, i === 0)).join('');
+  // Reply section
+  if (currentUser && !t.locked) {
+    document.getElementById('reply-section').innerHTML = `
+      <div class="reply-box">
+        <h3>Post a Reply</h3>
+        <div class="editor-toolbar">${editorToolbarHTML('reply-content')}</div>
+        <textarea class="editor-textarea" id="reply-content" placeholder="Write your reply…" oninput="updateCharCount('reply-content','reply-char')"></textarea>
+        <div class="editor-footer">
+          <span class="char-count" id="reply-char">0 characters</span>
+          <button class="btn btn-primary" onclick="submitReply()">Post Reply</button>
+        </div>
+      </div>`;
+  } else if (!currentUser) {
+    document.getElementById('reply-section').innerHTML = `<div class="reply-box" style="text-align:center;padding:24px"><p style="color:var(--text2);margin-bottom:12px">Join the discussion!</p><button class="btn btn-primary" onclick="openModal('login-modal')">Sign In to Reply</button></div>`;
+  } else if (t.locked) {
+    document.getElementById('reply-section').innerHTML = `<div class="reply-box" style="text-align:center;color:var(--text3)">🔒 This thread is locked</div>`;
+  }
+  // Sidebar
+  document.getElementById('thread-sidebar').innerHTML = `
+    <h3>Thread Info</h3>
+    <div style="font-size:0.82rem;color:var(--text2);line-height:2">
+      <div>📝 <strong>${posts.length}</strong> posts</div>
+      <div>👁️ <strong>${t.views||0}</strong> views</div>
+      <div>🕐 Started <strong>${timeAgo(t.createdAt)}</strong></div>
+      <div>👤 By <a onclick="showProfile('${t.authorId}')" style="color:var(--accent);cursor:pointer">${esc(author?.displayName||'Unknown')}</a></div>
+    </div>`;
+}
+
+function renderPost(post, isOP) {
+  const author = DB.users.find(u => u.id === post.authorId);
+  const likes = post.likes || [];
+  const liked = currentUser && likes.includes(currentUser.id);
+  return `<div class="post-card ${isOP?'op':''}" id="post-${post.id}">
+    <div class="post-header">
+      <div class="avatar" style="background:${author?avatarBg(author.username):'#888'};cursor:pointer" onclick="showProfile('${post.authorId}')">${author?author.avatar:'?'}</div>
+      <div class="post-user-info">
+        <div class="post-username" onclick="showProfile('${post.authorId}')">${esc(author?.displayName||'Unknown')}</div>
+        <div class="post-role ${author?.role||'member'}">${roleLabel(author?.role)}</div>
+      </div>
+      <div class="post-date">${formatDate(post.createdAt)}</div>
+    </div>
+    <div class="post-body">${renderMarkdown(post.content)}</div>
+    <div class="post-footer">
+      <button class="reaction-btn ${liked?'active':''}" onclick="toggleLike('${post.id}')">
+        ❤️ <span class="count">${likes.length}</span>
+      </button>
+      ${currentUser ? `<button class="reaction-btn" onclick="quotePost('${post.id}')">💬 Quote</button>` : ''}
+      ${canModerate() || (currentUser?.id === post.authorId) ? `<button class="reaction-btn" onclick="deletePost('${post.id}')" style="margin-left:auto;color:#dc2626">🗑️ Delete</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function submitReply() {
+  if (!currentUser) return openModal('login-modal');
+  const content = document.getElementById('reply-content').value.trim();
+  if (!content) { toast('Please write something before posting.', 'error'); return; }
+  if (content.length < 5) { toast('Reply is too short.', 'error'); return; }
+  const post = { id: 'p' + Date.now(), threadId: currentThread.id, authorId: currentUser.id, content, createdAt: Date.now(), likes: [] };
+  DB.posts.push(post);
+  currentThread.lastPostAt = Date.now();
+  currentThread.lastPostBy = currentUser.id;
+  currentThread.replyCount = (currentThread.replyCount || 0) + 1;
+  currentUser.postCount = (currentUser.postCount || 0) + 1;
+  const ui = DB.users.find(u => u.id === currentUser.id);
+  if (ui) ui.postCount = currentUser.postCount;
+  saveDB();
+  document.getElementById('reply-content').value = '';
+  renderThread();
+  toast('Reply posted! 💬', 'success');
+  setTimeout(() => { const last = document.querySelector('.post-card:last-of-type'); if (last) last.scrollIntoView({ behavior: 'smooth' }); }, 100);
+}
+
+function toggleLike(postId) {
+  if (!currentUser) return openModal('login-modal');
+  const post = DB.posts.find(p => p.id === postId);
+  if (!post) return;
+  post.likes = post.likes || [];
+  const idx = post.likes.indexOf(currentUser.id);
+  if (idx > -1) post.likes.splice(idx, 1);
+  else post.likes.push(currentUser.id);
+  saveDB();
+  renderThread();
+}
+
+function quotePost(postId) {
+  const post = DB.posts.find(p => p.id === postId);
+  const author = DB.users.find(u => u.id === post?.authorId);
+  if (!post) return;
+  const ta = document.getElementById('reply-content');
+  if (!ta) return;
+  ta.value += `> **${author?.displayName||'User'} said:**\n> ${post.content.split('\n').join('\n> ')}\n\n`;
+  ta.focus();
+  ta.scrollIntoView({ behavior: 'smooth' });
+}
+
+function createThread() {
+  if (!currentUser) return openModal('login-modal');
+  const catId = document.getElementById('thread-category').value;
+  const title = document.getElementById('thread-title').value.trim();
+  const content = document.getElementById('thread-content').value.trim();
+  const err = document.getElementById('thread-error');
+  if (!title) { err.textContent = 'Please add a title.'; return; }
+  if (!content || content.length < 10) { err.textContent = 'Content must be at least 10 characters.'; return; }
+  const thread = { id: 't' + Date.now(), categoryId: catId, title, authorId: currentUser.id, createdAt: Date.now(), lastPostAt: Date.now(), lastPostBy: currentUser.id, views: 0, replyCount: 0, pinned: false, locked: false };
+  const post = { id: 'p' + Date.now(), threadId: thread.id, authorId: currentUser.id, content, createdAt: Date.now(), likes: [] };
+  DB.threads.push(thread);
+  DB.posts.push(post);
+  currentUser.postCount = (currentUser.postCount || 0) + 1;
+  const ui = DB.users.find(u => u.id === currentUser.id);
+  if (ui) ui.postCount = currentUser.postCount;
+  saveDB();
+  err.textContent = '';
+  closeModal('new-thread-modal');
+  document.getElementById('thread-title').value = '';
+  document.getElementById('thread-content').value = '';
+  toast('Thread created! 🎉', 'success');
+  currentThread = thread;
+  showThread(thread.id);
+}
+
+function deleteThread(threadId) {
+  if (!confirm('Delete this thread and all its posts?')) return;
+  DB.threads = DB.threads.filter(t => t.id !== threadId);
+  DB.posts = DB.posts.filter(p => p.threadId !== threadId);
+  saveDB();
+  toast('Thread deleted.', 'info');
+  if (currentCategory) showCategory(currentCategory.id);
+  else showPage('home');
+}
+
+function deletePost(postId) {
+  if (!confirm('Delete this post?')) return;
+  const post = DB.posts.find(p => p.id === postId);
+  const isFirst = DB.posts.filter(p => p.threadId === post?.threadId).sort((a,b)=>a.createdAt-b.createdAt)[0]?.id === postId;
+  if (isFirst) { toast('Cannot delete the first post. Delete the thread instead.', 'error'); return; }
+  DB.posts = DB.posts.filter(p => p.id !== postId);
+  saveDB();
+  renderThread();
+  toast('Post deleted.', 'info');
+}
+
+function togglePin(threadId) {
+  const t = DB.threads.find(x => x.id === threadId);
+  if (t) { t.pinned = !t.pinned; saveDB(); renderThread(); toast(t.pinned ? '📌 Thread pinned' : 'Thread unpinned', 'info'); }
+}
+
+function toggleLock(threadId) {
+  const t = DB.threads.find(x => x.id === threadId);
+  if (t) { t.locked = !t.locked; saveDB(); renderThread(); toast(t.locked ? '🔒 Thread locked' : 'Thread unlocked', 'info'); }
+}
+
+function canModerate() {
+  return currentUser && (currentUser.role === 'admin' || currentUser.role === 'moderator');
+}
+
+// ==================== RECENT THREADS ====================
+function renderRecentThreads() {
+  const recent = [...DB.threads].sort((a,b) => b.lastPostAt - a.lastPostAt).slice(0, 8);
+  const el = document.getElementById('recent-threads');
+  if (!recent.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><h3>No threads yet</h3><p>Be the first to start a conversation!</p></div>'; return; }
+  el.innerHTML = recent.map(t => threadItem(t)).join('');
+}
+
+// ==================== PROFILE ====================
+function showProfile(userId) {
+  const user = DB.users.find(u => u.id === userId);
+  if (!user) return;
+  const isOwn = currentUser?.id === userId;
+  const isAdmin = currentUser?.role === 'admin';
+  const threads = DB.threads.filter(t => t.authorId === userId);
+  const posts = DB.posts.filter(p => p.authorId === userId);
+  const likes = DB.posts.reduce((acc, p) => acc + ((p.likes||[]).filter(id => id === userId).length), 0);
+  document.getElementById('profile-content').innerHTML = `
+    <div class="profile-header">
+      <div class="avatar avatar-xl" style="background:${avatarBg(user.username)}">${user.avatar}</div>
+      <div class="profile-info">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="profile-name">${esc(user.displayName)}</div>
+          <span class="badge badge-${user.role}">${roleLabel(user.role)}</span>
+        </div>
+        <div class="profile-joined">@${esc(user.username)} · Joined ${formatDate(user.joinedAt)}</div>
+        <div class="profile-bio">${esc(user.bio || 'No bio yet.')}</div>
+        <div class="profile-stats">
+          <div class="profile-stat"><div class="profile-stat-num">${threads.length}</div><div class="profile-stat-label">Threads</div></div>
+          <div class="profile-stat"><div class="profile-stat-num">${posts.length}</div><div class="profile-stat-label">Posts</div></div>
+          <div class="profile-stat"><div class="profile-stat-num">${(posts.reduce((a,p)=>a+(p.likes||[]).length,0))}</div><div class="profile-stat-label">Likes Received</div></div>
+        </div>
+        ${isOwn ? `<button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="openModal('edit-profile-modal')">⚙️ Edit Profile</button>` : ''}
+      </div>
+    </div>
+    <div class="tabs" style="margin-bottom:20px">
+      <button class="tab active" onclick="profileTab('threads','${userId}',this)">Threads</button>
+      <button class="tab" onclick="profileTab('posts','${userId}',this)">Posts</button>
+    </div>
+    <div id="profile-tab-content">
+      ${threads.length ? threads.map(t => threadItem(t)).join('') : '<div class="empty-state"><div class="empty-icon">💬</div><h3>No threads yet</h3></div>'}
+    </div>`;
+  showPage('profile');
+}
+
+function profileTab(tab, userId, el) {
+  document.querySelectorAll('#page-profile .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const user = DB.users.find(u => u.id === userId);
+  const cont = document.getElementById('profile-tab-content');
+  if (tab === 'threads') {
+    const threads = DB.threads.filter(t => t.authorId === userId);
+    cont.innerHTML = threads.length ? threads.map(t => threadItem(t)).join('') : '<div class="empty-state"><div class="empty-icon">💬</div><h3>No threads yet</h3></div>';
+  } else {
+    const posts = DB.posts.filter(p => p.authorId === userId).sort((a,b)=>b.createdAt-a.createdAt).slice(0,20);
+    cont.innerHTML = posts.length ? posts.map(p => {
+      const thread = DB.threads.find(t=>t.id===p.threadId);
+      return `<div class="post-card" style="margin-bottom:10px;cursor:pointer" onclick="showThread('${p.threadId}')">
+        <div class="post-header" style="padding:10px 16px"><span style="font-size:0.8rem;color:var(--accent)">in: ${esc(thread?.title||'Deleted thread')}</span><span class="post-date">${timeAgo(p.createdAt)}</span></div>
+        <div class="post-body" style="padding:12px 16px">${renderMarkdown(p.content.substring(0,300))}${p.content.length>300?'…':''}</div>
+      </div>`;
+    }).join('') : '<div class="empty-state"><div class="empty-icon">📝</div><h3>No posts yet</h3></div>';
+  }
+}
+
+function openEditProfile() {
+  if (!currentUser) return;
+  document.getElementById('edit-displayname').value = currentUser.displayName;
+  document.getElementById('edit-bio').value = currentUser.bio || '';
+  renderAvatarPicker('edit-avatar-options', currentUser.avatar);
+  openModal('edit-profile-modal');
+}
+
+function saveProfile() {
+  const dn = document.getElementById('edit-displayname').value.trim();
+  const bio = document.getElementById('edit-bio').value.trim();
+  const avEl = document.querySelector('#edit-avatar-options .avatar-opt.selected');
+  if (!dn) { toast('Display name cannot be empty.', 'error'); return; }
+  currentUser.displayName = dn;
+  currentUser.bio = bio;
+  if (avEl) currentUser.avatar = avEl.dataset.av;
+  const ui = DB.users.find(u => u.id === currentUser.id);
+  if (ui) { ui.displayName = dn; ui.bio = bio; if (avEl) ui.avatar = currentUser.avatar; }
+  saveDB();
+  updateAuthUI();
+  closeModal('edit-profile-modal');
+  toast('Profile updated! ✅', 'success');
+}
+
+// ==================== SEARCH ====================
+function liveSearch(q) {
+  if (q.length < 2) return;
+}
+
+function doSearch(q) {
+  if (!q.trim()) return;
+  document.getElementById('search-query-label').textContent = `Showing results for "${q}"`;
+  const results = [];
+  DB.threads.forEach(t => {
+    if (t.title.toLowerCase().includes(q.toLowerCase())) {
+      const cat = DB.categories.find(c => c.id === t.categoryId);
+      results.push({ type: 'thread', id: t.id, title: t.title, path: cat?.name || 'Unknown', date: t.createdAt });
+    }
+  });
+  DB.posts.forEach(p => {
+    if (p.content.toLowerCase().includes(q.toLowerCase())) {
+      const thread = DB.threads.find(t => t.id === p.threadId);
+      if (thread && !results.find(r => r.id === thread.id)) {
+        const cat = DB.categories.find(c => c.id === thread.categoryId);
+        results.push({ type: 'post', id: thread.id, title: thread.title, path: cat?.name || 'Unknown', excerpt: p.content.substring(0, 120) + '…', date: p.createdAt });
+      }
+    }
+  });
+  const el = document.getElementById('search-results');
+  if (!results.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><h3>No results found</h3><p>Try different keywords</p></div>'; }
+  else { el.innerHTML = results.map(r => `<div class="search-result" onclick="showThread('${r.id}')"><h4>${esc(r.title)}</h4>${r.excerpt?`<p>${esc(r.excerpt)}</p>`:'<p>Thread match</p>'}<div class="search-result-path">📂 ${esc(r.path)} · ${timeAgo(r.date)}</div></div>`).join(''); }
+  showPage('search');
+}
+
+// ==================== ADMIN ====================
+let adminCurrentTab = 'dashboard';
+
+function adminTab(tab) {
+  adminCurrentTab = tab;
+  document.querySelectorAll('.admin-nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('atab-' + tab).classList.add('active');
+  renderAdminTab();
+}
+
+function renderAdmin() {
+  if (currentUser?.role !== 'admin') { showPage('home'); return; }
+  renderAdminTab();
+}
+
+function renderAdminTab() {
+  const content = document.getElementById('admin-content');
+  const tab = adminCurrentTab;
+  if (tab === 'dashboard') {
+    content.innerHTML = `
+      <div class="admin-grid">
+        <div class="stat-card"><div class="stat-card-num">${DB.users.length}</div><div class="stat-card-label">Total Users</div></div>
+        <div class="stat-card"><div class="stat-card-num">${DB.threads.length}</div><div class="stat-card-label">Total Threads</div></div>
+        <div class="stat-card"><div class="stat-card-num">${DB.posts.length}</div><div class="stat-card-label">Total Posts</div></div>
+        <div class="stat-card"><div class="stat-card-num">${DB.categories.length}</div><div class="stat-card-label">Categories</div></div>
+      </div>
+      <div class="sidebar-card">
+        <h3>Recent Registrations</h3>
+        <table class="table">
+          <thead><tr><th>User</th><th>Role</th><th>Joined</th></tr></thead>
+          <tbody>${DB.users.slice(-5).reverse().map(u => `<tr><td><strong>${esc(u.displayName)}</strong> <span style="color:var(--text3);font-size:0.8rem">@${esc(u.username)}</span></td><td><span class="badge-role ${u.role}">${roleLabel(u.role)}</span></td><td>${timeAgo(u.joinedAt)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+  } else if (tab === 'users') {
+    content.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h2>Manage Users</h2>
+        <input class="form-input" style="width:220px;padding:8px 12px" placeholder="Search users…" oninput="filterAdminUsers(this.value)" id="admin-user-search">
+      </div>
+      <div class="sidebar-card" style="padding:0;overflow:hidden">
+        <table class="table" id="admin-users-table">
+          <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Posts</th><th>Actions</th></tr></thead>
+          <tbody id="admin-users-body">${renderUsersTable(DB.users)}</tbody>
+        </table>
+      </div>`;
+  } else if (tab === 'categories') {
+    content.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h2>Manage Categories</h2>
+        <button class="btn btn-primary btn-sm" onclick="openCatModal()">+ Add Category</button>
+      </div>
+      <div class="sidebar-card" style="padding:0;overflow:hidden">
+        <table class="table">
+          <thead><tr><th>Category</th><th>Threads</th><th>Posts</th><th>Actions</th></tr></thead>
+          <tbody>${DB.categories.map(cat => `<tr>
+            <td><strong>${cat.icon} ${esc(cat.name)}</strong><br><span style="font-size:0.78rem;color:var(--text3)">${esc(cat.desc.substring(0,60))}…</span></td>
+            <td>${DB.threads.filter(t=>t.categoryId===cat.id).length}</td>
+            <td>${DB.posts.filter(p=>DB.threads.find(t=>t.id===p.threadId&&t.categoryId===cat.id)).length}</td>
+            <td><button class="btn btn-sm btn-outline" onclick="editCategoryModal('${cat.id}')">Edit</button> <button class="btn btn-sm btn-danger" onclick="deleteCategory('${cat.id}')">Delete</button></td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+  } else if (tab === 'threads') {
+    content.innerHTML = `
+      <h2 style="margin-bottom:16px">Manage Threads</h2>
+      <div class="sidebar-card" style="padding:0;overflow:hidden">
+        <table class="table">
+          <thead><tr><th>Thread</th><th>Category</th><th>Author</th><th>Actions</th></tr></thead>
+          <tbody>${DB.threads.slice().reverse().map(t => {
+            const cat = DB.categories.find(c=>c.id===t.categoryId);
+            const auth = DB.users.find(u=>u.id===t.authorId);
+            return `<tr>
+              <td style="cursor:pointer;color:var(--accent)" onclick="showThread('${t.id}')">${esc(t.title.substring(0,50))}</td>
+              <td>${esc(cat?.name||'?')}</td>
+              <td>${esc(auth?.displayName||'?')}</td>
+              <td>
+                <button class="btn btn-sm btn-outline" onclick="togglePin('${t.id}')">${t.pinned?'Unpin':'Pin'}</button>
+                <button class="btn btn-sm btn-outline" onclick="toggleLock('${t.id}')">${t.locked?'Unlock':'Lock'}</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteThread('${t.id}')">Delete</button>
+              </td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table>
+      </div>`;
+  } else if (tab === 'settings') {
+    content.innerHTML = `
+      <h2 style="margin-bottom:16px">Forum Settings</h2>
+      <div class="sidebar-card">
+        <div class="form-group"><label class="form-label">Forum Name</label><input class="form-input" id="s-name" value="${esc(DB.settings.forumName)}"></div>
+        <div class="form-group"><label class="form-label">Forum Tagline</label><input class="form-input" id="s-tag" value="${esc(DB.settings.forumTagline)}"></div>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+      </div>`;
+  }
+}
+
+function renderUsersTable(users) {
+  return users.map(u => `<tr>
+    <td style="cursor:pointer" onclick="showProfile('${u.id}')">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar" style="background:${avatarBg(u.username)}">${u.avatar}</div>
+        <div><strong>${esc(u.displayName)}</strong><br><span style="font-size:0.78rem;color:var(--text3)">@${esc(u.username)}</span></div>
+      </div>
+    </td>
+    <td style="font-size:0.82rem">${esc(u.email)}</td>
+    <td><span class="badge-role ${u.role}">${roleLabel(u.role)}</span></td>
+    <td>${u.postCount||0}</td>
+    <td>
+      <button class="btn btn-sm btn-outline" onclick="openEditUser('${u.id}')">Edit</button>
+      ${u.id !== 'admin' ? `<button class="btn btn-sm btn-danger" onclick="toggleBan('${u.id}')">${u.role==='banned'?'Unban':'Ban'}</button>` : ''}
+    </td>
+  </tr>`).join('');
+}
+
+function filterAdminUsers(q) {
+  const filtered = q ? DB.users.filter(u => u.username.toLowerCase().includes(q.toLowerCase()) || u.displayName.toLowerCase().includes(q.toLowerCase()) || u.email.toLowerCase().includes(q.toLowerCase())) : DB.users;
+  document.getElementById('admin-users-body').innerHTML = renderUsersTable(filtered);
+}
+
+function toggleBan(userId) {
+  const u = DB.users.find(x => x.id === userId);
+  if (!u) return;
+  u.role = u.role === 'banned' ? 'member' : 'banned';
+  saveDB();
+  renderAdminTab();
+  toast(u.role === 'banned' ? `${u.displayName} has been banned.` : `${u.displayName} has been unbanned.`, 'info');
+}
+
+function openEditUser(userId) {
+  const u = DB.users.find(x => x.id === userId);
+  if (!u) return;
+  document.getElementById('edit-user-form').innerHTML = `
+    <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" id="eu-displayname" value="${esc(u.displayName)}"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="eu-email" value="${esc(u.email)}"></div>
+    <div class="form-group"><label class="form-label">Role</label>
+      <select class="form-select" id="eu-role">
+        <option value="member" ${u.role==='member'?'selected':''}>Member</option>
+        <option value="moderator" ${u.role==='moderator'?'selected':''}>Moderator</option>
+        <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+        <option value="banned" ${u.role==='banned'?'selected':''}>Banned</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="eu-bio">${esc(u.bio||'')}</textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-outline" onclick="closeModal('edit-user-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditUser('${u.id}')">Save Changes</button>
+    </div>`;
+  openModal('edit-user-modal');
+}
+
+function saveEditUser(userId) {
+  const u = DB.users.find(x => x.id === userId);
+  if (!u) return;
+  u.displayName = document.getElementById('eu-displayname').value.trim() || u.displayName;
+  u.email = document.getElementById('eu-email').value.trim() || u.email;
+  u.role = document.getElementById('eu-role').value;
+  u.bio = document.getElementById('eu-bio').value.trim();
+  saveDB();
+  closeModal('edit-user-modal');
+  renderAdminTab();
+  toast('User updated!', 'success');
+}
+
+function saveSettings() {
+  DB.settings.forumName = document.getElementById('s-name').value.trim() || DB.settings.forumName;
+  DB.settings.forumTagline = document.getElementById('s-tag').value.trim() || DB.settings.forumTagline;
+  saveDB();
+  toast('Settings saved! ✅', 'success');
+}
+
+function deleteCategory(catId) {
+  const threads = DB.threads.filter(t => t.categoryId === catId).length;
+  if (threads && !confirm(`This will also delete ${threads} thread(s). Continue?`)) return;
+  const tids = DB.threads.filter(t => t.categoryId === catId).map(t => t.id);
+  DB.posts = DB.posts.filter(p => !tids.includes(p.threadId));
+  DB.threads = DB.threads.filter(t => t.categoryId !== catId);
+  DB.categories = DB.categories.filter(c => c.id !== catId);
+  saveDB();
+  renderAdminTab();
+  toast('Category deleted.', 'info');
+}
+
+// ==================== CATEGORY MODAL ====================
+function openCatModal(catId) {
+  document.getElementById('cat-modal-title').textContent = catId ? 'Edit Category' : 'Add Category';
+  document.getElementById('cat-name').value = '';
+  document.getElementById('cat-desc').value = '';
+  document.getElementById('cat-icon').value = '';
+  document.getElementById('cat-edit-id').value = catId || '';
+  if (catId) {
+    const cat = DB.categories.find(c => c.id === catId);
+    if (cat) { document.getElementById('cat-name').value = cat.name; document.getElementById('cat-desc').value = cat.desc; document.getElementById('cat-icon').value = cat.icon; }
+  }
+  const picker = document.getElementById('cat-color-picker');
+  picker.innerHTML = CAT_COLORS.map((c, i) => `<div class="chip ${c.includes('1')?'selected':''}" data-color="${c}" onclick="selectColor(this)">${CAT_COLOR_LABELS[i]}</div>`).join('');
+  openModal('manage-cats-modal');
+}
+
+function editCategoryModal(catId) { openCatModal(catId); openModal('manage-cats-modal'); }
+
+function selectColor(el) {
+  document.querySelectorAll('#cat-color-picker .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function saveCategory() {
+  const name = document.getElementById('cat-name').value.trim();
+  const desc = document.getElementById('cat-desc').value.trim();
+  const icon = document.getElementById('cat-icon').value.trim() || '📁';
+  const color = document.querySelector('#cat-color-picker .chip.selected')?.dataset.color || 'color-accent-1';
+  const editId = document.getElementById('cat-edit-id').value;
+  if (!name) { toast('Category name is required.', 'error'); return; }
+  if (editId) {
+    const cat = DB.categories.find(c => c.id === editId);
+    if (cat) { cat.name = name; cat.desc = desc; cat.icon = icon; cat.color = color; }
+  } else {
+    DB.categories.push({ id: 'cat' + Date.now(), name, desc, icon, color, createdAt: Date.now() });
+  }
+  saveDB();
+  closeModal('manage-cats-modal');
+  renderCategories();
+  if (adminCurrentTab === 'categories') renderAdminTab();
+  toast('Category saved! ✅', 'success');
+}
+
+// ==================== MODALS ====================
+function openModal(id) {
+  if (id === 'register-modal') renderAvatarPicker('reg-avatar-options', null);
+  if (id === 'edit-profile-modal') openEditProfile();
+  if (id === 'new-thread-modal') {
+    const sel = document.getElementById('thread-category');
+    sel.innerHTML = DB.categories.map(c => `<option value="${c.id}">${c.icon} ${esc(c.name)}</option>`).join('');
+    if (currentCategory) sel.value = currentCategory.id;
+    buildEditorToolbar('thread-editor-toolbar', 'thread-content', 'thread-char-count');
+  }
+  if (id === 'manage-cats-modal') openCatModal();
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function switchModal(from, to) {
+  closeModal(from);
+  openModal(to);
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ==================== EDITOR ====================
+function editorToolbarHTML(targetId) {
+  return `<button class="editor-btn" onclick="fmt('${targetId}','bold')" title="Bold"><strong>B</strong></button>
+  <button class="editor-btn" onclick="fmt('${targetId}','italic')" title="Italic"><em>I</em></button>
+  <button class="editor-btn" onclick="fmt('${targetId}','code')" title="Code">{"}</button>
+  <button class="editor-btn" onclick="fmt('${targetId}','quote')" title="Quote">❝</button>
+  <button class="editor-btn" onclick="fmt('${targetId}','ul')" title="List">• List</button>
+  <button class="editor-btn" onclick="fmt('${targetId}','link')" title="Link">🔗</button>`;
+}
+
+function buildEditorToolbar(toolbarId, targetId, countId) {
+  document.getElementById(toolbarId).innerHTML = editorToolbarHTML(targetId);
+  document.getElementById(targetId).oninput = () => updateCharCount(targetId, countId);
+}
+
+function fmt(targetId, type) {
+  const ta = document.getElementById(targetId);
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end);
+  let rep = sel;
+  if (type === 'bold') rep = `**${sel||'bold text'}**`;
+  else if (type === 'italic') rep = `*${sel||'italic text'}*`;
+  else if (type === 'code') rep = `\`${sel||'code'}\``;
+  else if (type === 'quote') rep = `> ${sel||'quoted text'}`;
+  else if (type === 'ul') rep = `\n- ${sel||'item'}\n- item\n- item\n`;
+  else if (type === 'link') { const url = prompt('Enter URL:'); if (url) rep = `[${sel||'link text'}](${url})`; }
+  ta.value = ta.value.substring(0, start) + rep + ta.value.substring(end);
+  ta.focus();
+}
+
+function updateCharCount(taId, countId) {
+  const len = document.getElementById(taId)?.value.length || 0;
+  const el = document.getElementById(countId);
+  if (el) el.textContent = len + ' characters';
+}
+
+// ==================== MARKDOWN RENDERER ====================
+function renderMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code>$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s,'<ul>$1</ul>')
+    .replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank" rel="noopener" style="color:var(--accent)">$1</a>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>')
+    .replace(/^(.+)$/,'<p>$1</p>');
+}
+
+// ==================== AVATAR PICKER ====================
+function renderAvatarPicker(containerId, current) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = AVATARS.map(av => `<div class="avatar-opt ${av===current?'selected':''}" data-av="${av}" onclick="selectAvatar(this,'${containerId}')">${av}</div>`).join('');
+}
+
+function selectAvatar(el, containerId) {
+  document.querySelectorAll(`#${containerId} .avatar-opt`).forEach(a => a.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ==================== THREAD CATEGORY SELECT ====================
+function populateThreadCategorySelect() {
+  const sel = document.getElementById('thread-category');
+  if (!sel) return;
+  sel.innerHTML = DB.categories.map(c => `<option value="${c.id}">${c.icon} ${esc(c.name)}</option>`).join('');
+  if (currentCategory) sel.value = currentCategory.id;
+}
+
+// ==================== UTILS ====================
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  if (diff < 2592000000) return Math.floor(diff/86400000) + 'd ago';
+  return formatDate(ts);
+}
+
+function formatDate(ts) {
+  return new Date(ts).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function roleLabel(role) {
+  return { admin: '⭐ Admin', moderator: '🛡️ Moderator', member: 'Member', banned: '⛔ Banned' }[role] || 'Member';
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('hobbyhub_theme', isDark ? 'light' : 'dark');
+}
+
+function toggleUserMenu(force) {
+  const menu = document.getElementById('user-menu');
+  if (force === false) { menu.classList.remove('open'); return; }
+  menu.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-menu-wrap')) toggleUserMenu(false);
+});
+
+function toast(msg, type='info') {
+  const container = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  container.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ==================== INIT ====================
+initDB();
+// Restore theme
+const savedTheme = localStorage.getItem('hobbyhub_theme');
+if (savedTheme === 'dark') { document.documentElement.setAttribute('data-theme','dark'); document.getElementById('theme-icon').textContent = '☀️'; }
+
+renderHome();
+updateAuthUI();
+
+// Keyboard shortcut: Escape closes modals
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+</script>
+</body>
+</html>
